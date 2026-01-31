@@ -6,7 +6,7 @@
 set -euo pipefail
 
 # Configuration
-readonly GITHUB_RAW_BASE="${GITHUB_RAW_BASE:-https://raw.githubusercontent.com/ahammond/enforce-screentime-minecraft/main}"
+readonly GITHUB_RAW_BASE="https://raw.githubusercontent.com/ahammond/enforce-screentime-minecraft/main"
 readonly SCRIPT_NAME="enforce-screentime-minecraft.sh"
 readonly PLIST_NAME="com.user.enforce-screentime-minecraft.plist"
 readonly INSTALL_DIR="/usr/local/bin"
@@ -202,7 +202,7 @@ install_plist() {
         if is_loaded; then
             was_loaded=true
             log_info "Unloading current configuration..."
-            launchctl unload "$PLIST_PATH" 2>/dev/null || true
+            launchctl bootout system "$PLIST_PATH" 2>/dev/null || true
         fi
     else
         log_info "Installing launchd configuration..."
@@ -213,7 +213,13 @@ install_plist() {
     chmod 644 "$PLIST_PATH"
 
     log_info "Loading launchd configuration..."
-    launchctl load "$PLIST_PATH"
+    if launchctl bootstrap system "$PLIST_PATH" 2>&1; then
+        log_info "Configuration loaded successfully"
+    else
+        local exit_code=$?
+        log_error "Failed to load launchd configuration (exit code: $exit_code)"
+        log_error "You may need to manually run: sudo launchctl bootstrap system ${PLIST_PATH}"
+    fi
 
     log_info "Configuration installed to ${PLIST_PATH}"
 }
@@ -276,8 +282,8 @@ Next steps:
   • Test the script: sudo ${SCRIPT_PATH}
   • View logs: log show --predicate 'eventMessage contains "screentime-enforce"' --last 1h
   • Update time: Re-run installer with --time=HH:MM
-  • Temporarily disable: sudo launchctl unload ${PLIST_PATH}
-  • Re-enable: sudo launchctl load ${PLIST_PATH}
+  • Temporarily disable: sudo launchctl bootout system ${PLIST_PATH}
+  • Re-enable: sudo launchctl bootstrap system ${PLIST_PATH}
 
 For more information: https://github.com/ahammond/enforce-screentime-minecraft
 EOF

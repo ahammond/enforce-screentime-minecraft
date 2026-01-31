@@ -47,7 +47,7 @@ unload_daemon() {
 
     if is_loaded; then
         log_info "Stopping Screen Time enforcement..."
-        if launchctl unload "$PLIST_PATH" 2>/dev/null; then
+        if launchctl bootout system "$PLIST_PATH" 2>/dev/null; then
             log_info "Enforcement stopped successfully"
         else
             log_warn "Could not stop enforcement (it may not be running)"

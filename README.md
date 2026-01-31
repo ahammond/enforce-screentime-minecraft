@@ -107,10 +107,10 @@ Need to allow extra time one evening?
 
 ```bash
 # Disable
-sudo launchctl unload /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist
+sudo launchctl bootout system /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist
 
 # Re-enable
-sudo launchctl load /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist
+sudo launchctl bootstrap system /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist
 ```
 
 but... honestly? Just wait until after the shutdown time, grant the additional screentime

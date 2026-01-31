@@ -90,10 +90,10 @@ If you need to allow extended play time for one day:
 
 ```bash
 # Disable enforcement
-sudo launchctl unload /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist
+sudo launchctl bootout system /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist
 
 # Re-enable enforcement (will run at next scheduled time)
-sudo launchctl load /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist
+sudo launchctl bootstrap system /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist
 ```
 
 ### Check Current Configuration
@@ -149,7 +149,7 @@ sudo chmod +x /usr/local/bin/enforce-screentime-minecraft.sh
 sudo cp com.user.enforce-screentime-minecraft.plist /Library/LaunchDaemons/
 sudo chown root:wheel /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist
 sudo chmod 644 /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist
-sudo launchctl load /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist
+sudo launchctl bootstrap system /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist
 ```
 
 ## Uninstallation
@@ -158,7 +158,7 @@ To completely remove Screen Time enforcement:
 
 ```bash
 # Unload the daemon
-sudo launchctl unload /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist
+sudo launchctl bootout system /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist
 
 # Remove files
 sudo rm /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist
@@ -169,6 +169,7 @@ sudo rm /usr/local/bin/enforce-screentime-minecraft.sh
 
 **Minecraft isn't being terminated:**
 1. Check if the daemon is loaded: `sudo launchctl list | grep enforce-screentime`
+   - If not listed, manually load it: `sudo launchctl bootstrap system /Library/LaunchDaemons/com.user.enforce-screentime-minecraft.plist`
 2. Test the script manually: `sudo /usr/local/bin/enforce-screentime-minecraft.sh`
 3. Check logs: `log show --predicate 'eventMessage contains "screentime-enforce"' --last 1d --style compact`
 

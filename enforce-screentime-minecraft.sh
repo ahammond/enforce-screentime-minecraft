@@ -34,8 +34,10 @@ check_enforcement_window() {
     fi
 
     local scheduled_hour scheduled_minute
-    scheduled_hour=$(sed -n '/<key>Hour<\/key>/{n;s/.*<integer>\([0-9]*\)<\/integer>.*/\1/p;}' "$plist_path")
-    scheduled_minute=$(sed -n '/<key>Minute<\/key>/{n;s/.*<integer>\([0-9]*\)<\/integer>.*/\1/p;}' "$plist_path")
+
+    # Use plutil for reliable XML parsing
+    scheduled_hour=$(plutil -extract StartCalendarInterval.Hour raw "$plist_path" 2>/dev/null)
+    scheduled_minute=$(plutil -extract StartCalendarInterval.Minute raw "$plist_path" 2>/dev/null)
 
     if [[ -z "$scheduled_hour" || -z "$scheduled_minute" ]]; then
         log_error "Could not read scheduled time from $plist_path"
@@ -96,12 +98,24 @@ main() {
         return 0
     fi
 
-    log_info "Found Minecraft processes bypassing Screen Time: $minecraft_pids"
+    log_info "Found potential Minecraft processes: $minecraft_pids"
 
-    # Attempt graceful termination first
+    # Validate and process each PID
     for pid in $minecraft_pids; do
+        # Validate PID is numeric
+        if ! [[ "$pid" =~ ^[0-9]+$ ]]; then
+            log_error "Invalid PID format detected: $pid - skipping"
+            continue
+        fi
+
+        # Verify process still exists and is a Java process
         if ! ps -p "$pid" > /dev/null 2>&1; then
             log_info "Process $pid already terminated"
+            continue
+        fi
+
+        if ! ps -p "$pid" -o comm= 2>/dev/null | grep -q java; then
+            log_info "Process $pid is not a Java process - skipping"
             continue
         fi
 
