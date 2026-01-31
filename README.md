@@ -43,14 +43,26 @@ That's it! Minecraft will now be terminated at your specified time, daily. Scree
 
 ## How It Works
 
-1. At the scheduled time, it...
-2. Searches for Minecraft Java processes
-3. Sends graceful termination signal (TERM)
-4. Waits 2 seconds for Minecraft to save
-5. Forces termination if still running (KILL)
-6. Logs all actions to system log
+1. At the scheduled time daily, the system runs the enforcement script
+2. Script checks if current time is within enforcement window (6 hours after scheduled time)
+3. If within window, searches for Minecraft Java processes
+4. Sends graceful termination signal (TERM)
+5. Waits 2 seconds for Minecraft to save
+6. Forces termination if still running (KILL)
+7. Logs all actions to system log
 
 This makes Minecraft follow the same Screen Time rules as native macOS apps.
+
+### Handling Sleep/Wake
+
+If your laptop is asleep at the scheduled time (e.g., 7:05 PM), the enforcement will automatically run when the system wakes up, **but only if you're still within the 6-hour enforcement window**. This means:
+
+- ✅ Laptop wakes at 8:00 PM → Minecraft terminated (within window)
+- ✅ Laptop wakes at 11:00 PM → Minecraft terminated (within window)
+- ❌ Laptop wakes at 9:00 AM next day → Minecraft NOT terminated (outside window)
+
+This prevents unwanted shutdowns the next morning while still catching violations on late wakeups.
+
 Unfortunately I haven't found a way to access the native screentime API
 to know what time to enforce. If you know how, please let me know by opening a GH issue.
 

@@ -184,10 +184,24 @@ sudo rm /usr/local/bin/enforce-screentime-minecraft.sh
 ## How It Works
 
 1. At the scheduled time daily, launchd runs the script
-2. Script searches for Java processes with "minecraft" in the command
-3. Sends graceful termination signal (TERM)
-4. Waits 2 seconds for Minecraft to save and exit
-5. If still running, forces termination (KILL)
-6. Logs all actions to system log
+2. Script checks if current time is within enforcement window (6 hours after scheduled time)
+3. If within window, searches for Java processes with "minecraft" in the command
+4. Sends graceful termination signal (TERM)
+5. Waits 2 seconds for Minecraft to save and exit
+6. If still running, forces termination (KILL)
+7. Logs all actions to system log
 
 This makes Minecraft follow the same Screen Time rules as other apps on your child's computer.
+
+### What Happens If The Laptop Is Asleep?
+
+If the laptop is asleep at the enforcement time (e.g., 7:05 PM), the system automatically handles this:
+
+- When the laptop wakes up, the enforcement script runs automatically
+- **However**, the script only terminates Minecraft if you're still within the 6-hour enforcement window
+- This prevents unwanted terminations if the laptop wakes the next morning
+
+**Examples:**
+- Scheduled time: 7:05 PM, Laptop wakes at 8:30 PM → ✅ Minecraft terminated
+- Scheduled time: 7:05 PM, Laptop wakes at 12:00 AM → ✅ Minecraft terminated (still within 6h window)
+- Scheduled time: 7:05 PM, Laptop wakes at 9:00 AM → ❌ Minecraft NOT terminated (outside 6h window)
