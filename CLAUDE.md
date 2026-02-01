@@ -31,9 +31,12 @@ sudo /usr/local/bin/enforce-screentime-minecraft.sh
 
 **View logs (all actions use macOS unified logging with tag "screentime-enforce"):**
 ```bash
-log show --predicate 'eventMessage contains "screentime-enforce"' --last 1h --style compact
-log stream --predicate 'eventMessage contains "screentime-enforce"'
+# Note: Use /usr/bin/log (not just 'log') to avoid shell builtin shadowing
+/usr/bin/log show --predicate 'eventMessage contains "screentime-enforce"' --last 1h --info
+/usr/bin/log stream --predicate 'eventMessage contains "screentime-enforce"'
 ```
+
+**Important:** The `--info` flag is required because `logger` writes at info level by default, and `log show` skips info/debug messages without it.
 
 **Check if daemon is loaded:**
 ```bash

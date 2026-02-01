@@ -98,7 +98,7 @@ sudo /usr/local/bin/enforce-screentime-minecraft.sh
 View logs:
 
 ```bash
-log show --predicate 'eventMessage contains "screentime-enforce"' --last 1h --style compact
+/usr/bin/log show --predicate 'eventMessage contains "screentime-enforce"' --last 1h --info --style compact
 ```
 
 ## Temporarily Disable
